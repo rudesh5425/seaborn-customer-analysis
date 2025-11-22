@@ -2,6 +2,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+from PIL import Image, ImageOps
 
 # Synthetic realistic customer spending data
 np.random.seed(42)
@@ -25,10 +26,10 @@ data = pd.DataFrame({
 sns.set_style("whitegrid")
 sns.set_context("talk")
 
-# Exactly 512x512 pixels → figsize + dpi trick
-plt.figure(figsize=(8, 8), dpi=64)  # 8 inches × 64 dpi = 512 px
+# Step 1 — Create figure
+plt.figure(figsize=(8, 8), dpi=64)
 
-# Boxplot
+# Step 2 — Boxplot
 sns.boxplot(
     data=data,
     x="Customer_Segment",
@@ -36,11 +37,15 @@ sns.boxplot(
     palette="Set2"
 )
 
-# Titles & labels
 plt.title("Purchase Amount Distribution by Customer Segment", fontsize=14)
 plt.xlabel("Customer Segment")
 plt.ylabel("Purchase Amount ($)")
 
-# Save EXACT size
-plt.savefig("chart.png", dpi=64, bbox_inches="tight")
+# Step 3 — Save image (required bbox_inches='tight')
+plt.savefig("chart_temp.png", dpi=64, bbox_inches='tight')
 plt.close()
+
+# Step 4 — FORCE final image to EXACT 512×512 using padding
+img = Image.open("chart_temp.png")
+final_img = ImageOps.pad(img, (512, 512), color="white")
+final_img.save("chart.png")
